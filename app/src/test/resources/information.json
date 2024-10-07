@@ -1,0 +1,538 @@
+{
+  "vegetarian": false,
+  "vegan": false,
+  "glutenFree": false,
+  "dairyFree": false,
+  "veryHealthy": false,
+  "cheap": false,
+  "veryPopular": false,
+  "sustainable": false,
+  "lowFodmap": false,
+  "weightWatcherSmartPoints": 8,
+  "gaps": "no",
+  "preparationMinutes": null,
+  "cookingMinutes": null,
+  "aggregateLikes": 1,
+  "healthScore": 11,
+  "creditsText": "foodista.com",
+  "sourceName": "foodista.com",
+  "pricePerServing": 173.9,
+  "extendedIngredients": [
+    {
+      "id": 23557,
+      "aisle": "Meat",
+      "image": "fresh-ground-beef.jpg",
+      "consistency": "SOLID",
+      "name": "ground beef",
+      "nameClean": "95 percent lean ground beef",
+      "original": "1 pound lean ground beef",
+      "originalName": "lean ground beef",
+      "amount": 1,
+      "unit": "pound",
+      "meta": [
+        "lean"
+      ],
+      "measures": {
+        "us": {
+          "amount": 1,
+          "unitShort": "lb",
+          "unitLong": "pound"
+        },
+        "metric": {
+          "amount": 453.592,
+          "unitShort": "g",
+          "unitLong": "grams"
+        }
+      }
+    },
+    {
+      "id": 11209,
+      "aisle": "Produce",
+      "image": "eggplant.png",
+      "consistency": "SOLID",
+      "name": "eggplant",
+      "nameClean": "eggplant",
+      "original": "2 cups diced eggplant",
+      "originalName": "diced eggplant",
+      "amount": 2,
+      "unit": "cups",
+      "meta": [
+        "diced"
+      ],
+      "measures": {
+        "us": {
+          "amount": 2,
+          "unitShort": "cups",
+          "unitLong": "cups"
+        },
+        "metric": {
+          "amount": 164,
+          "unitShort": "g",
+          "unitLong": "grams"
+        }
+      }
+    },
+    {
+      "id": 10111549,
+      "aisle": "Pasta and Rice",
+      "image": "tomato-sauce-or-pasta-sauce.jpg",
+      "consistency": "SOLID",
+      "name": "paul newman's marinara sauce",
+      "nameClean": "marinara sauce",
+      "original": "1 jar Paul Newman's marinara sauce",
+      "originalName": "Paul Newman's marinara sauce",
+      "amount": 1,
+      "unit": "jar",
+      "meta": [],
+      "measures": {
+        "us": {
+          "amount": 1,
+          "unitShort": "jar",
+          "unitLong": "jar"
+        },
+        "metric": {
+          "amount": 1,
+          "unitShort": "jar",
+          "unitLong": "jar"
+        }
+      }
+    },
+    {
+      "id": 1032009,
+      "aisle": "Spices and Seasonings",
+      "image": "red-pepper-flakes.jpg",
+      "consistency": "SOLID",
+      "name": "pepper flakes",
+      "nameClean": "red pepper flakes",
+      "original": "1/4 teaspoon red pepper flakes",
+      "originalName": "red pepper flakes",
+      "amount": 0.25,
+      "unit": "teaspoon",
+      "meta": [
+        "red"
+      ],
+      "measures": {
+        "us": {
+          "amount": 0.25,
+          "unitShort": "tsps",
+          "unitLong": "teaspoons"
+        },
+        "metric": {
+          "amount": 0.25,
+          "unitShort": "tsps",
+          "unitLong": "teaspoons"
+        }
+      }
+    },
+    {
+      "id": 1022020,
+      "aisle": "Spices and Seasonings",
+      "image": "garlic-powder.png",
+      "consistency": "SOLID",
+      "name": "garlic powder",
+      "nameClean": "garlic powder",
+      "original": "1/4 teaspoon garlic powder",
+      "originalName": "garlic powder",
+      "amount": 0.25,
+      "unit": "teaspoon",
+      "meta": [],
+      "measures": {
+        "us": {
+          "amount": 0.25,
+          "unitShort": "tsps",
+          "unitLong": "teaspoons"
+        },
+        "metric": {
+          "amount": 0.25,
+          "unitShort": "tsps",
+          "unitLong": "teaspoons"
+        }
+      }
+    },
+    {
+      "id": 2026,
+      "aisle": "Spices and Seasonings",
+      "image": "onion-powder.jpg",
+      "consistency": "SOLID",
+      "name": "onion powder",
+      "nameClean": "onion powder",
+      "original": "1/4 teaspoon onion powder",
+      "originalName": "onion powder",
+      "amount": 0.25,
+      "unit": "teaspoon",
+      "meta": [],
+      "measures": {
+        "us": {
+          "amount": 0.25,
+          "unitShort": "tsps",
+          "unitLong": "teaspoons"
+        },
+        "metric": {
+          "amount": 0.25,
+          "unitShort": "tsps",
+          "unitLong": "teaspoons"
+        }
+      }
+    },
+    {
+      "id": 2044,
+      "aisle": "Produce",
+      "image": "fresh-basil.jpg",
+      "consistency": "SOLID",
+      "name": "basil flakes",
+      "nameClean": "fresh basil",
+      "original": "1/4 teaspoon basil flakes",
+      "originalName": "basil flakes",
+      "amount": 0.25,
+      "unit": "teaspoon",
+      "meta": [],
+      "measures": {
+        "us": {
+          "amount": 0.25,
+          "unitShort": "tsps",
+          "unitLong": "teaspoons"
+        },
+        "metric": {
+          "amount": 0.25,
+          "unitShort": "tsps",
+          "unitLong": "teaspoons"
+        }
+      }
+    },
+    {
+      "id": 14412,
+      "aisle": "Beverages",
+      "image": "water.png",
+      "consistency": "LIQUID",
+      "name": "water",
+      "nameClean": "water",
+      "original": "1 cup water",
+      "originalName": "water",
+      "amount": 1,
+      "unit": "cup",
+      "meta": [],
+      "measures": {
+        "us": {
+          "amount": 1,
+          "unitShort": "cup",
+          "unitLong": "cup"
+        },
+        "metric": {
+          "amount": 236.588,
+          "unitShort": "ml",
+          "unitLong": "milliliters"
+        }
+      }
+    },
+    {
+      "id": 1037,
+      "aisle": "Cheese",
+      "image": "ricotta.png",
+      "consistency": "LIQUID",
+      "name": "part skim ricotta cheese",
+      "nameClean": "low fat ricotta cheese",
+      "original": "15 ounces part skim ricotta cheese",
+      "originalName": "part skim ricotta cheese",
+      "amount": 15,
+      "unit": "ounces",
+      "meta": [],
+      "measures": {
+        "us": {
+          "amount": 15,
+          "unitShort": "oz",
+          "unitLong": "ounces"
+        },
+        "metric": {
+          "amount": 425.243,
+          "unitShort": "g",
+          "unitLong": "grams"
+        }
+      }
+    },
+    {
+      "id": 11297,
+      "aisle": "Produce",
+      "image": "parsley.jpg",
+      "consistency": "SOLID",
+      "name": "parsley",
+      "nameClean": "parsley",
+      "original": "1 teaspoon chopped parsley",
+      "originalName": "chopped parsley",
+      "amount": 1,
+      "unit": "teaspoon",
+      "meta": [
+        "chopped"
+      ],
+      "measures": {
+        "us": {
+          "amount": 1,
+          "unitShort": "tsp",
+          "unitLong": "teaspoon"
+        },
+        "metric": {
+          "amount": 1,
+          "unitShort": "tsp",
+          "unitLong": "teaspoon"
+        }
+      }
+    },
+    {
+      "id": 93833,
+      "aisle": "Milk, Eggs, Other Dairy",
+      "image": "liquid-egg-substitute.jpg",
+      "consistency": "SOLID",
+      "name": "egg beaters",
+      "nameClean": "liquid egg whites",
+      "original": "1/4 cup Egg Beaters",
+      "originalName": "Egg Beaters",
+      "amount": 0.25,
+      "unit": "cup",
+      "meta": [],
+      "measures": {
+        "us": {
+          "amount": 0.25,
+          "unitShort": "cups",
+          "unitLong": "cups"
+        },
+        "metric": {
+          "amount": 56.5,
+          "unitShort": "ml",
+          "unitLong": "milliliters"
+        }
+      }
+    },
+    {
+      "id": 1033,
+      "aisle": "Cheese",
+      "image": "parmesan.jpg",
+      "consistency": "SOLID",
+      "name": "parmesan cheese",
+      "nameClean": "parmesan",
+      "original": "1 cup shredded parmesan cheese (not grated, shredded)",
+      "originalName": "shredded parmesan cheese (not grated, shredded)",
+      "amount": 1,
+      "unit": "cup",
+      "meta": [
+        "shredded",
+        "grated",
+        "(not , )"
+      ],
+      "measures": {
+        "us": {
+          "amount": 1,
+          "unitShort": "cup",
+          "unitLong": "cup"
+        },
+        "metric": {
+          "amount": 100,
+          "unitShort": "g",
+          "unitLong": "grams"
+        }
+      }
+    },
+    {
+      "id": 12420420,
+      "aisle": "Pasta and Rice",
+      "image": "lasagna-noodles.jpg",
+      "consistency": "SOLID",
+      "name": "no boil lasagna noodles",
+      "nameClean": "oven ready lasagne noodles",
+      "original": "8 no boil lasagna noodles",
+      "originalName": "no boil lasagna noodles",
+      "amount": 8,
+      "unit": "",
+      "meta": [],
+      "measures": {
+        "us": {
+          "amount": 8,
+          "unitShort": "",
+          "unitLong": ""
+        },
+        "metric": {
+          "amount": 8,
+          "unitShort": "",
+          "unitLong": ""
+        }
+      }
+    }
+  ],
+  "id": 640864,
+  "title": "Crock Pot Lasagna",
+  "readyInMinutes": 45,
+  "servings": 8,
+  "sourceUrl": "https://www.foodista.com/recipe/QTRKQVWX/crock-pot-lasagna",
+  "image": "https://img.spoonacular.com/recipes/640864-556x370.jpg",
+  "imageType": "jpg",
+  "summary": "Crock Pot Lasagna might be just the <b>Mediterranean</b> recipe you are searching for. This main course has <b>294 calories</b>, <b>27g of protein</b>, and <b>11g of fat</b> per serving. This recipe serves 8. For <b>$1.74 per serving</b>, this recipe <b>covers 17%</b> of your daily requirements of vitamins and minerals. 1 person were impressed by this recipe. A mixture of parmesan cheese, water, paul newman's marinara sauce, and a handful of other ingredients are all it takes to make this recipe so scrumptious. From preparation to the plate, this recipe takes roughly <b>45 minutes</b>. It is brought to you by Foodista. Taking all factors into account, this recipe <b>earns a spoonacular score of 53%</b>, which is pretty good. If you like this recipe, you might also like recipes such as <a href=\"https://spoonacular.com/recipes/crock-pot-lasagna-1627949\">Crock Pot Lasagna</a>, <a href=\"https://spoonacular.com/recipes/crock-pot-lasagna-1378087\">Crock Pot Lasagna</a>, and <a href=\"https://spoonacular.com/recipes/crock-pot-lasagna-701944\">Crock Pot Lasagna</a>.",
+  "cuisines": [
+    "Mediterranean",
+    "Italian",
+    "European"
+  ],
+  "dishTypes": [
+    "lunch",
+    "main course",
+    "main dish",
+    "dinner"
+  ],
+  "diets": [],
+  "occasions": [],
+  "instructions": "Brown the ground beef in a heated skillet and drain off any fat and water. Stir in the pepper, sauce, onion powder, garlic powder, basil flakes, water, and eggplant. In a bowl combine the egg, cheeses and parsley. Place a layer of meat sauce on the bottom of a crock pot. I find my oval shaped on works the best here. Top with 2-3 noodles, nipping off the corners in order to get a nice fit. Add another layer of meat sauce and then one thick layer of the cheese mixture. Top with a final layer of noodles and then a final layer of meat sauce. Cover and cook on low 3-4 hours.",
+  "analyzedInstructions": [
+    {
+      "name": "",
+      "steps": [
+        {
+          "number": 1,
+          "step": "Brown the ground beef in a heated skillet and drain off any fat and water. Stir in the pepper, sauce, onion powder, garlic powder, basil flakes, water, and eggplant. In a bowl combine the egg, cheeses and parsley.",
+          "ingredients": [
+            {
+              "id": 1022020,
+              "name": "garlic powder",
+              "localizedName": "garlic powder",
+              "image": "garlic-powder.png"
+            },
+            {
+              "id": 2026,
+              "name": "onion powder",
+              "localizedName": "onion powder",
+              "image": "onion-powder.jpg"
+            },
+            {
+              "id": 10023572,
+              "name": "ground beef",
+              "localizedName": "ground beef",
+              "image": "fresh-ground-beef.jpg"
+            },
+            {
+              "id": 11209,
+              "name": "eggplant",
+              "localizedName": "eggplant",
+              "image": "eggplant.png"
+            },
+            {
+              "id": 11297,
+              "name": "parsley",
+              "localizedName": "parsley",
+              "image": "parsley.jpg"
+            },
+            {
+              "id": 1002030,
+              "name": "pepper",
+              "localizedName": "pepper",
+              "image": "pepper.jpg"
+            },
+            {
+              "id": 2044,
+              "name": "basil",
+              "localizedName": "basil",
+              "image": "basil.jpg"
+            },
+            {
+              "id": 0,
+              "name": "sauce",
+              "localizedName": "sauce",
+              "image": ""
+            },
+            {
+              "id": 14412,
+              "name": "water",
+              "localizedName": "water",
+              "image": "water.png"
+            },
+            {
+              "id": 1123,
+              "name": "egg",
+              "localizedName": "egg",
+              "image": "egg.png"
+            }
+          ],
+          "equipment": [
+            {
+              "id": 404645,
+              "name": "frying pan",
+              "localizedName": "frying pan",
+              "image": "https://spoonacular.com/cdn/equipment_100x100/pan.png"
+            },
+            {
+              "id": 404783,
+              "name": "bowl",
+              "localizedName": "bowl",
+              "image": "https://spoonacular.com/cdn/equipment_100x100/bowl.jpg"
+            }
+          ]
+        },
+        {
+          "number": 2,
+          "step": "Place a layer of meat sauce on the bottom of a crock pot. I find my oval shaped on works the best here. Top with 2-3 noodles, nipping off the corners in order to get a nice fit.",
+          "ingredients": [
+            {
+              "id": 20420,
+              "name": "pasta",
+              "localizedName": "pasta",
+              "image": "https://spoonacular.com/cdn/ingredients_100x100/fusilli.jpg"
+            },
+            {
+              "id": 0,
+              "name": "sauce",
+              "localizedName": "sauce",
+              "image": ""
+            },
+            {
+              "id": 1065062,
+              "name": "meat",
+              "localizedName": "meat",
+              "image": "whole-chicken.jpg"
+            }
+          ],
+          "equipment": [
+            {
+              "id": 404718,
+              "name": "slow cooker",
+              "localizedName": "slow cooker",
+              "image": "https://spoonacular.com/cdn/equipment_100x100/slow-cooker.jpg"
+            }
+          ]
+        },
+        {
+          "number": 3,
+          "step": "Add another layer of meat sauce and then one thick layer of the cheese mixture. Top with a final layer of noodles and then a final layer of meat sauce. Cover and cook on low 3-4 hours.",
+          "ingredients": [
+            {
+              "id": 20420,
+              "name": "pasta",
+              "localizedName": "pasta",
+              "image": "https://spoonacular.com/cdn/ingredients_100x100/fusilli.jpg"
+            },
+            {
+              "id": 1041009,
+              "name": "cheese",
+              "localizedName": "cheese",
+              "image": "https://spoonacular.com/cdn/ingredients_100x100/cheddar-cheese.png"
+            },
+            {
+              "id": 0,
+              "name": "sauce",
+              "localizedName": "sauce",
+              "image": ""
+            },
+            {
+              "id": 1065062,
+              "name": "meat",
+              "localizedName": "meat",
+              "image": "whole-chicken.jpg"
+            }
+          ],
+          "equipment": [],
+          "length": {
+            "number": 240,
+            "unit": "minutes"
+          }
+        }
+      ]
+    }
+  ],
+  "originalId": null,
+  "spoonacularScore": 54.740882873535156,
+  "spoonacularSourceUrl": "https://spoonacular.com/crock-pot-lasagna-640864"
+}
