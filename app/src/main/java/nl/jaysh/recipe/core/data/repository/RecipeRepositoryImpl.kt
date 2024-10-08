@@ -15,6 +15,7 @@ import nl.jaysh.recipe.core.data.local.room.entity.RecipeDetailEntity
 import nl.jaysh.recipe.core.data.local.room.entity.toRecipeDetail
 import nl.jaysh.recipe.core.data.network.model.detail.IngredientDTO
 import nl.jaysh.recipe.core.data.network.model.detail.InstructionDTO
+import nl.jaysh.recipe.core.data.network.model.detail.RecipeDetailDTO
 import nl.jaysh.recipe.core.data.network.model.detail.toIngredient
 import nl.jaysh.recipe.core.data.network.model.detail.toInstruction
 import nl.jaysh.recipe.core.data.network.model.detail.toRecipeDetail
@@ -49,57 +50,78 @@ class RecipeRepositoryImpl @Inject constructor(
     }
 
     override fun fetchRecipeDetail(recipeId: Long): Flow<Either<Failure, RecipeDetail>> {
-        return dao
-            .getById(id = recipeId)
-            .map { recipeEntity ->
-                recipeEntity
-                    ?.decodeRecipeDetail()
-                    ?: fetchAndStoreRecipeDetail(recipeId)
-            }
-            .flowOn(context = dispatcher)
+        return dao.getById(id = recipeId).map { recipeEntity ->
+            recipeEntity
+                ?.let { convertToRecipeDetail(it) }
+                ?: retrieveAndSaveRecipeDetail(recipeId)
+        }.flowOn(context = dispatcher)
     }
 
     override suspend fun setFavouriteRecipe(recipeId: Long, isFavourite: Boolean) {
-        dao.updateFavouriteStatus(recipeId = recipeId, isFavourite = isFavourite)
+        dao.updateFavouriteStatus(
+            recipeId = recipeId,
+            isFavourite = isFavourite,
+        )
     }
 
     override fun getFavouriteRecipe(): Flow<Either<Failure, List<RecipeDetail>>> = dao
         .getFavourites()
-        .map { entities ->
-            entities.map { entity -> entity.decodeRecipeDetail() }.sequence()
-        }
+        .map(::convertToRecipeDetailList)
         .flowOn(context = dispatcher)
 
-    // For 'simplicity' maps List<Instruction> and List<Ingredient> as Json String to store
-    private suspend fun fetchAndStoreRecipeDetail(recipeId: Long): Either<Failure, RecipeDetail> {
-        return recipeService.fetchRecipeDetail(recipeId)
-            .flatMap { recipeDetailDTO ->
-                val recipeDetail = recipeDetailDTO.toRecipeDetail()
-                val recipeEntity = RecipeDetailEntity.fromRecipeDetail(
-                    recipeDetail = recipeDetail,
-                    analyzedInstructions = Json.encodeToString(recipeDetailDTO.analyzedInstructions),
-                    extendedIngredients = Json.encodeToString(recipeDetailDTO.extendedIngredients),
-                )
+    private suspend fun retrieveAndSaveRecipeDetail(recipeId: Long): Either<Failure, RecipeDetail> {
+        val recipeDetailDTO = recipeService.fetchRecipeDetail(recipeId)
 
-                try {
-                    dao.save(recipeEntity)
-                    Either.Right(recipeDetail)
-                } catch (e: RuntimeException) {
-                    Either.Left(StorageFailure.IO)
-                }
-            }
+        return recipeDetailDTO.flatMap { detailDTO ->
+            val recipeEntity = convertToRecipeDetailEntity(detailDTO)
+            val savedEntity = saveRecipeDetailEntity(recipeEntity)
+            return savedEntity.map { detailDTO.toRecipeDetail() }
+        }
     }
 
-    // For 'simplicity' decodes back to List<Instruction> and List<Ingredient>
-    private fun RecipeDetailEntity.decodeRecipeDetail(): Either<Failure, RecipeDetail> {
+    private fun saveRecipeDetailEntity(
+        entity: RecipeDetailEntity,
+    ): Either<Failure, RecipeDetailEntity> = try {
+        dao.save(entity)
+        Either.Right(entity)
+    } catch (e: RuntimeException) {
+        Either.Left(StorageFailure.IO)
+    }
+
+    /**
+     * For 'simplicity' we encode + store the list of ingredients and list of instructions as
+     * JSON string. On retrieval we decode the JSON string back to objects.
+     */
+    private fun convertToRecipeDetailEntity(recipeDetailDTO: RecipeDetailDTO): RecipeDetailEntity {
+        val recipeDetail = recipeDetailDTO.toRecipeDetail()
+        val analyzedInstructions = Json.encodeToString(recipeDetailDTO.analyzedInstructions)
+        val extendedIngredients = Json.encodeToString(recipeDetailDTO.extendedIngredients)
+
+        return RecipeDetailEntity.fromRecipeDetail(
+            recipeDetail = recipeDetail,
+            analyzedInstructions = analyzedInstructions,
+            extendedIngredients = extendedIngredients,
+        )
+    }
+
+    private fun convertToRecipeDetailList(
+        details: List<RecipeDetailEntity>,
+    ): Either<Failure, List<RecipeDetail>> {
+        return details.map(::convertToRecipeDetail).sequence()
+    }
+
+    private fun convertToRecipeDetail(entity: RecipeDetailEntity): Either<Failure, RecipeDetail> {
+        val analyzedInstructions = entity.analyzedInstructions
+        val extendedIngredients = entity.extendedIngredients
+
         try {
             val instructions = Json.decodeFromString<List<InstructionDTO>>(analyzedInstructions)
-            val ingredients = Json.decodeFromString<List<IngredientDTO>>(extendedIngredients)
+                .map { it.toInstruction() }
 
-            val recipeDetail = toRecipeDetail(
-                analyzedInstructions = instructions.map { it.toInstruction() },
-                extendedIngredients = ingredients.map { it.toIngredient() },
-            )
+            val ingredients = Json.decodeFromString<List<IngredientDTO>>(extendedIngredients)
+                .map { it.toIngredient() }
+
+            val recipeDetail = entity.toRecipeDetail(instructions, ingredients)
 
             return Either.Right(recipeDetail)
         } catch (e: SerializationException) {
