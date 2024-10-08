@@ -69,7 +69,6 @@ class RecipeRepositoryImpl @Inject constructor(
         .map(::convertToRecipeDetailList)
         .flowOn(context = dispatcher)
 
-
     private suspend fun retrieveAndSaveRecipeDetail(recipeId: Long): Either<Failure, RecipeDetail> {
         val recipeDetailDTO = recipeService.fetchRecipeDetail(recipeId)
 
