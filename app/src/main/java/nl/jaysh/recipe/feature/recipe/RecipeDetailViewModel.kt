@@ -38,9 +38,9 @@ class RecipeDetailViewModel @Inject constructor(
             initialValue = RecipeDetailViewModelState(),
         )
 
-    fun setFavourite(recipeId: Long, isFavourite: Boolean) {
+    fun setFavourite(recipe: RecipeDetail, isFavourite: Boolean) {
         viewModelScope.launch {
-            repository.setFavouriteRecipe(recipeId = recipeId, isFavourite = isFavourite)
+            repository.setFavouriteRecipe(recipe, isFavourite)
         }
     }
 

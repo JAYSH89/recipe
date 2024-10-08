@@ -57,9 +57,9 @@ class RecipeRepositoryImpl @Inject constructor(
         }.flowOn(context = dispatcher)
     }
 
-    override suspend fun setFavouriteRecipe(recipeId: Long, isFavourite: Boolean) {
+    override suspend fun setFavouriteRecipe(recipe: RecipeDetail, isFavourite: Boolean) {
         dao.updateFavouriteStatus(
-            recipeId = recipeId,
+            recipeId = recipe.id,
             isFavourite = isFavourite,
         )
     }

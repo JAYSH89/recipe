@@ -2,6 +2,8 @@ package nl.jaysh.recipe.helper.objects
 
 import nl.jaysh.recipe.core.data.network.model.search.SearchResponseDTO
 import nl.jaysh.recipe.core.data.network.model.search.SearchResultDTO
+import nl.jaysh.recipe.core.data.network.model.search.toSearchResult
+import nl.jaysh.recipe.core.domain.model.search.SearchResult
 
 object SearchRecipeObjects {
     val testSearchResponseDTO = SearchResponseDTO(
@@ -25,4 +27,8 @@ object SearchRecipeObjects {
         number = 2,
         totalResults = 24,
     )
+
+    val testSearchResults: List<SearchResult> = testSearchResponseDTO
+        .results
+        .map { it.toSearchResult() }
 }

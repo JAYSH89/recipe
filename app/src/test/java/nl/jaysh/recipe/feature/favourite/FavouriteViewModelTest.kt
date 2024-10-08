@@ -19,6 +19,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import nl.jaysh.recipe.core.domain.RecipeRepository
+import nl.jaysh.recipe.helper.FakeRecipeRepository
+import nl.jaysh.recipe.helper.objects.RecipeDetailObjects
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -34,7 +36,7 @@ class FavouriteViewModelTest {
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(dispatcher)
-        repository = mockk()
+        repository = FakeRecipeRepository()
         viewModel = FavouriteViewModel(repository = repository)
     }
 
@@ -46,8 +48,6 @@ class FavouriteViewModelTest {
 
     @Test
     fun `initial state is Loading`() = runTest {
-        every { repository.getFavouriteRecipe() } returns emptyFlow()
-
         viewModel.state.test {
             val initialEmission = awaitItem()
             assertThat(initialEmission).isEqualTo(FavouriteViewModelState.Loading)
@@ -57,16 +57,13 @@ class FavouriteViewModelTest {
 
     @Test
     fun `fetch recipes successful state is Success`() = runTest {
-        val simulateDelay = 100L
-        every { repository.getFavouriteRecipe() } returns flow {
-            delay(simulateDelay) // simulate delay
-            emit(Either.Right(emptyList()))
-        }
-
         viewModel.state.test {
             assertThat(awaitItem()).isEqualTo(FavouriteViewModelState.Loading)
-            advanceTimeBy(simulateDelay)
-            assertThat(awaitItem()).isEqualTo(FavouriteViewModelState.Success(emptyList()))
+            advanceTimeBy(FakeRecipeRepository.FAKE_DELAY)
+
+            val expected = listOf(RecipeDetailObjects.testRecipeDetail)
+            assertThat(awaitItem()).isEqualTo(FavouriteViewModelState.Success(expected))
+
             expectNoEvents()
         }
     }

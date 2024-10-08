@@ -98,9 +98,13 @@ class RecipeRepositoryTest {
     fun `set as favourite should update in db`() = runTest {
         coEvery { dao.updateFavouriteStatus(recipeId = any(), isFavourite = true) } returns Unit
 
-        repository.setFavouriteRecipe(recipeId = testRecipeId, isFavourite = true)
+        repository.setFavouriteRecipe(
+            recipe = RecipeDetailObjects.testRecipeDetail,
+            isFavourite = true,
+        )
 
-        coVerify(exactly = 1) { dao.updateFavouriteStatus(testRecipeId, true) }
+        val id = RecipeDetailObjects.testRecipeDetail.id
+        coVerify(exactly = 1) { dao.updateFavouriteStatus(id, true) }
     }
 
     @Test
