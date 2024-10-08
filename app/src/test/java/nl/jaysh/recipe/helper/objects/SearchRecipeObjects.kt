@@ -4,7 +4,7 @@ import nl.jaysh.recipe.core.data.network.model.search.SearchResponseDTO
 import nl.jaysh.recipe.core.data.network.model.search.SearchResultDTO
 
 object SearchRecipeObjects {
-    val searchResponseDTO = SearchResponseDTO(
+    val testSearchResponseDTO = SearchResponseDTO(
         results = listOf(
             SearchResultDTO(
                 id = 640864L,

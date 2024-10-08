@@ -23,7 +23,7 @@ object RecipeDetailObjects {
         image = "water.png"
     )
 
-    val recipeDetail = RecipeDetail(
+    val testRecipeDetail = RecipeDetail(
         id = 640864L,
         title = "Crock Pot Lasagna",
         readyInMinutes = 45,
@@ -58,7 +58,7 @@ object RecipeDetailObjects {
         extendedIngredients = emptyList(),
     )
 
-    val recipeDetailEntity = RecipeDetailEntity(
+    val testRecipeDetailEntity = RecipeDetailEntity(
         id = 640864L,
         title = "Crock Pot Lasagna",
         readyInMinutes = 45,

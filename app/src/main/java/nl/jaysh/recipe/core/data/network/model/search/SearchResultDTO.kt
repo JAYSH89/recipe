@@ -1,7 +1,7 @@
 package nl.jaysh.recipe.core.data.network.model.search
 
 import kotlinx.serialization.Serializable
-import nl.jaysh.recipe.core.domain.model.search.SearchRecipeResult
+import nl.jaysh.recipe.core.domain.model.search.SearchResult
 
 @Serializable
 data class SearchResultDTO(
@@ -12,7 +12,7 @@ data class SearchResultDTO(
     val readyInMinutes: Int,
 )
 
-fun SearchResultDTO.toSearchResult(): SearchRecipeResult = SearchRecipeResult(
+fun SearchResultDTO.toSearchResult(): SearchResult = SearchResult(
     id = id,
     title = title,
     summary = summary,

@@ -1,6 +1,5 @@
 package nl.jaysh.recipe.feature.recipe
 
-import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +17,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import nl.jaysh.recipe.core.domain.RecipeRepository
 import nl.jaysh.recipe.core.domain.model.failure.Failure
-import nl.jaysh.recipe.core.domain.model.search.SearchRecipeResult
+import nl.jaysh.recipe.core.domain.model.search.SearchResult
 import nl.jaysh.recipe.feature.recipe.FetchRecipeState.Error
 import nl.jaysh.recipe.feature.recipe.FetchRecipeState.Loading
 import nl.jaysh.recipe.feature.recipe.FetchRecipeState.Success
@@ -52,7 +51,7 @@ class RecipeOverviewViewModel @Inject constructor(
         emit(newState)
 
         repository
-            .searchRecipes(query)
+            .search(query)
             .collect { result ->
                 result.fold(
                     ifLeft = { failure ->
@@ -76,5 +75,5 @@ data class RecipeOverviewViewModelState(
 sealed interface FetchRecipeState {
     data object Loading : FetchRecipeState
     data class Error(val failure: Failure) : FetchRecipeState
-    data class Success(val recipes: List<SearchRecipeResult>) : FetchRecipeState
+    data class Success(val recipes: List<SearchResult>) : FetchRecipeState
 }

@@ -20,13 +20,13 @@ import nl.jaysh.recipe.core.data.network.model.detail.toIngredient
 import nl.jaysh.recipe.core.data.network.model.detail.toInstruction
 import nl.jaysh.recipe.core.data.network.model.detail.toRecipeDetail
 import nl.jaysh.recipe.core.data.network.model.search.toSearchResult
-import nl.jaysh.recipe.core.data.network.service.RecipeService
+import nl.jaysh.recipe.core.data.network.service.RecipeRemoteDataSource
 import nl.jaysh.recipe.core.domain.RecipeRepository
 import nl.jaysh.recipe.core.domain.model.detail.RecipeDetail
 import nl.jaysh.recipe.core.domain.model.failure.Failure
 import nl.jaysh.recipe.core.domain.model.failure.ParseFailure
 import nl.jaysh.recipe.core.domain.model.failure.StorageFailure
-import nl.jaysh.recipe.core.domain.model.search.SearchRecipeResult
+import nl.jaysh.recipe.core.domain.model.search.SearchResult
 import nl.jaysh.recipe.core.utils.sequence
 import nl.jaysh.recipe.di.dispatcher.IoDispatcher
 import javax.inject.Inject
@@ -35,13 +35,13 @@ import javax.inject.Singleton
 @Singleton
 class RecipeRepositoryImpl @Inject constructor(
     private val dao: RecipeDetailDao,
-    private val recipeService: RecipeService,
+    private val recipeRemoteDataSource: RecipeRemoteDataSource,
     @IoDispatcher private val dispatcher: CoroutineDispatcher,
 ) : RecipeRepository {
 
-    override fun searchRecipes(query: String): Flow<Either<Failure, List<SearchRecipeResult>>> {
+    override fun search(query: String): Flow<Either<Failure, List<SearchResult>>> {
         return flow {
-            val searchResults = recipeService.searchRecipes(query)
+            val searchResults = recipeRemoteDataSource.search(query)
                 .map { response -> response.results }
                 .map { results -> results.map { it.toSearchResult() } }
 
@@ -49,7 +49,7 @@ class RecipeRepositoryImpl @Inject constructor(
         }.flowOn(context = dispatcher)
     }
 
-    override fun fetchRecipeDetail(recipeId: Long): Flow<Either<Failure, RecipeDetail>> {
+    override fun getDetails(recipeId: Long): Flow<Either<Failure, RecipeDetail>> {
         return dao.getById(id = recipeId).map { recipeEntity ->
             recipeEntity
                 ?.let { convertToRecipeDetail(it) }
@@ -70,7 +70,7 @@ class RecipeRepositoryImpl @Inject constructor(
         .flowOn(context = dispatcher)
 
     private suspend fun retrieveAndSaveRecipeDetail(recipeId: Long): Either<Failure, RecipeDetail> {
-        val recipeDetailDTO = recipeService.fetchRecipeDetail(recipeId)
+        val recipeDetailDTO = recipeRemoteDataSource.getDetails(recipeId)
 
         return recipeDetailDTO.flatMap { detailDTO ->
             val recipeEntity = convertToRecipeDetailEntity(detailDTO)

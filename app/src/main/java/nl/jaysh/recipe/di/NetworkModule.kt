@@ -7,8 +7,8 @@ import dagger.hilt.components.SingletonComponent
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import nl.jaysh.recipe.core.data.network.KtorClient
-import nl.jaysh.recipe.core.data.network.service.RecipeService
-import nl.jaysh.recipe.core.data.network.service.RecipeServiceImpl
+import nl.jaysh.recipe.core.data.network.service.RecipeRemoteDataSource
+import nl.jaysh.recipe.core.data.network.service.RecipeRemoteDataSourceImpl
 import javax.inject.Singleton
 
 @Module
@@ -24,7 +24,7 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun providesRecipeService(httpClient: HttpClient): RecipeService {
-        return RecipeServiceImpl(httpClient = httpClient)
+    fun providesRecipeService(httpClient: HttpClient): RecipeRemoteDataSource {
+        return RecipeRemoteDataSourceImpl(httpClient = httpClient)
     }
 }

@@ -66,7 +66,7 @@ class RecipeOverviewViewModelTest {
     fun `unsuccessful fetch recipes initially`() = runTest {
         val fakeNetworkDelay = 200L
         val failingRepository = mockk<RecipeRepository>()
-        every { failingRepository.searchRecipes(query = any()) } returns flow {
+        every { failingRepository.search(query = any()) } returns flow {
             delay(fakeNetworkDelay)
             emit(Either.Left(NetworkFailure.UNAUTHORIZED))
         }
@@ -85,7 +85,7 @@ class RecipeOverviewViewModelTest {
             expectNoEvents()
         }
 
-        verify(exactly = 1) { failingRepository.searchRecipes(query = any()) }
+        verify(exactly = 1) { failingRepository.search(query = any()) }
     }
 
     @Test

@@ -22,9 +22,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class RecipeServiceImpl @Inject constructor(private val httpClient: HttpClient) : RecipeService {
+class RecipeRemoteDataSourceImpl @Inject constructor(
+    private val httpClient: HttpClient,
+) : RecipeRemoteDataSource {
 
-    override suspend fun searchRecipes(query: String): Either<Failure, SearchResponseDTO> {
+    override suspend fun search(query: String): Either<Failure, SearchResponseDTO> {
         val path = "/recipes/complexSearch"
 
         return Either.catch {
@@ -37,7 +39,7 @@ class RecipeServiceImpl @Inject constructor(private val httpClient: HttpClient) 
         }.mapLeft(::mapToFailure)
     }
 
-    override suspend fun fetchRecipeDetail(recipeId: Long): Either<Failure, RecipeDetailDTO> {
+    override suspend fun getDetails(recipeId: Long): Either<Failure, RecipeDetailDTO> {
         val path = "/recipes/$recipeId/information"
 
         return Either.catch {
