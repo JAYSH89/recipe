@@ -1,5 +1,6 @@
 package nl.jaysh.recipe.feature.recipe
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -43,23 +48,15 @@ import nl.jaysh.recipe.R
 import nl.jaysh.recipe.core.designsystem.theme.RecipeTheme
 import nl.jaysh.recipe.core.designsystem.theme.blue
 import nl.jaysh.recipe.core.designsystem.theme.orange
+import nl.jaysh.recipe.core.domain.model.detail.Ingredient
 import nl.jaysh.recipe.core.domain.model.detail.Instruction
 import nl.jaysh.recipe.core.domain.model.detail.InstructionStep
 import nl.jaysh.recipe.core.domain.model.detail.RecipeDetail
+import nl.jaysh.recipe.core.domain.model.failure.NetworkFailure
 import nl.jaysh.recipe.core.ui.composables.RecipeAsyncImage
 import nl.jaysh.recipe.core.ui.composables.RecipeErrorLayout
 import nl.jaysh.recipe.core.ui.composables.RecipeLoadingLayout
 import nl.jaysh.recipe.core.utils.Constants.CDN_BASE_URL
-
-@Preview
-@Composable
-private fun RecipeDetailScreenPreview() = RecipeTheme {
-    RecipeDetailScreenContent(
-        state = RecipeDetailViewModelState(),
-        onClickBack = {},
-        onClickFavourite = { _, _ -> },
-    )
-}
 
 @Composable
 fun RecipeDetailScreen(
@@ -325,5 +322,75 @@ private fun InstructionImagePlaceholder(
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.displayMedium,
         color = Color.White,
+    )
+}
+
+// PREVIEWS
+
+@PreviewLightDark
+@Composable
+private fun RecipeDetailScreenLoadingPreview() = RecipeTheme {
+    RecipeDetailScreenContent(
+        state = RecipeDetailViewModelState(),
+        onClickBack = {},
+        onClickFavourite = { _, _ -> },
+    )
+}
+
+@PreviewLightDark
+@Composable
+private fun RecipeDetailScreenErrorPreview() = RecipeTheme {
+    RecipeDetailScreenContent(
+        state = RecipeDetailViewModelState(
+            fetchedRecipeDetail = FetchRecipeDetailState.Error(NetworkFailure.UNAUTHORIZED),
+        ),
+        onClickBack = {},
+        onClickFavourite = { _, _ -> },
+    )
+}
+
+@PreviewLightDark
+@Composable
+private fun RecipeDetailScreenContentPreview() = RecipeTheme {
+    var isFavourite by remember { mutableStateOf(false) }
+
+    val detail = RecipeDetail(
+        id = 640864L,
+        title = "Crock Pot Lasagna",
+        readyInMinutes = 45,
+        image = "https://img.spoonacular.com/recipes/640864-556x370.jpg",
+        sourceUrl = "https://www.foodista.com/recipe/QTRKQVWX/crock-pot-lasagna",
+        instructions = "instructions",
+        analyzedInstructions = listOf(
+            Instruction(
+                name = "",
+                steps = listOf(
+                    InstructionStep(
+                        number = 1,
+                        step = "Brown the ground beef",
+                        equipment = listOf(),
+                        ingredients = listOf(),
+                    ),
+                    InstructionStep(
+                        number = 2,
+                        step = "Place a layer of meat",
+                        equipment = listOf(),
+                        ingredients = listOf(),
+                    ),
+                )
+            )
+        ),
+        extendedIngredients = listOf(
+            Ingredient(1L, "Water"),
+            Ingredient(1L, "Egg"),
+        ),
+        favourite = isFavourite,
+    )
+    RecipeDetailScreenContent(
+        state = RecipeDetailViewModelState(
+            fetchedRecipeDetail = FetchRecipeDetailState.Success(detail),
+        ),
+        onClickBack = {},
+        onClickFavourite = { _, _ -> isFavourite = !isFavourite},
     )
 }

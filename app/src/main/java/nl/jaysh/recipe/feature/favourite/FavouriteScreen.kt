@@ -23,21 +23,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import nl.jaysh.recipe.R
 import nl.jaysh.recipe.core.designsystem.theme.RecipeTheme
+import nl.jaysh.recipe.core.domain.model.detail.Ingredient
+import nl.jaysh.recipe.core.domain.model.detail.Instruction
+import nl.jaysh.recipe.core.domain.model.detail.InstructionStep
 import nl.jaysh.recipe.core.domain.model.detail.RecipeDetail
+import nl.jaysh.recipe.core.domain.model.failure.UnknownFailure
 import nl.jaysh.recipe.core.ui.composables.RecipeAsyncImage
 import nl.jaysh.recipe.core.ui.composables.RecipeErrorLayout
 import nl.jaysh.recipe.core.ui.composables.RecipeLoadingLayout
-
-@Preview
-@Composable
-private fun FavouriteScreenPreview() = RecipeTheme {
-    FavouriteScreenContent(state = FavouriteViewModelState.Loading, onClick = {})
-}
 
 @Composable
 fun FavouriteScreen(
@@ -118,3 +117,67 @@ private fun FavouriteListItem(recipe: RecipeDetail, onClick: (Long) -> Unit) = C
         }
     )
 }
+
+// PREVIEWS
+
+@PreviewLightDark
+@Composable
+private fun FavouriteScreenLoadingPreview() = RecipeTheme {
+    FavouriteScreenContent(
+        state = FavouriteViewModelState.Loading,
+        onClick = {},
+    )
+}
+
+@PreviewLightDark
+@Composable
+private fun FavouriteScreenErrorPreview() = RecipeTheme {
+    FavouriteScreenContent(
+        state = FavouriteViewModelState.Error(UnknownFailure.Unspecified),
+        onClick = {},
+    )
+}
+
+@PreviewLightDark
+@Composable
+private fun FavouriteScreenSuccessPreview() = RecipeTheme {
+    val detail = RecipeDetail(
+        id = 640864L,
+        title = "Crock Pot Lasagna",
+        readyInMinutes = 45,
+        image = "https://img.spoonacular.com/recipes/640864-556x370.jpg",
+        sourceUrl = "https://www.foodista.com/recipe/QTRKQVWX/crock-pot-lasagna",
+        instructions = "instructions",
+        analyzedInstructions = listOf(
+            Instruction(
+                name = "",
+                steps = listOf(
+                    InstructionStep(
+                        number = 1,
+                        step = "Brown the ground beef",
+                        equipment = listOf(),
+                        ingredients = listOf(),
+                    ),
+                    InstructionStep(
+                        number = 2,
+                        step = "Place a layer of meat",
+                        equipment = listOf(),
+                        ingredients = listOf(),
+                    ),
+                )
+            )
+        ),
+        extendedIngredients = listOf(
+            Ingredient(1L, "Water"),
+            Ingredient(1L, "Egg"),
+        ),
+        favourite = true,
+    )
+
+    FavouriteScreenContent(
+        state = FavouriteViewModelState.Success(List(10) { detail }),
+        onClick = {},
+    )
+}
+
+
