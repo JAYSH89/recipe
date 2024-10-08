@@ -14,7 +14,7 @@ import nl.jaysh.recipe.helper.objects.RecipeDetailObjects
 class FakeRecipeRepository : RecipeRepository {
 
     private var recipes: List<SearchResult> = mutableListOf()
-    private var recipeDetail = RecipeDetailObjects.recipeDetail
+    private var recipeDetail = RecipeDetailObjects.testRecipeDetail
 
     override fun search(query: String): Flow<Either<Failure, List<SearchResult>>> {
         return flow {

@@ -44,7 +44,7 @@ class RecipeRepositoryTest {
 
     @Test
     fun `search successful`() = runTest {
-        val response = Either.Right(SearchRecipeObjects.searchResponseDTO)
+        val response = Either.Right(SearchRecipeObjects.testSearchResponseDTO)
         coEvery { service.search(query = any()) } returns response
 
         val result = repository.search(query = testQuery).first()
@@ -69,7 +69,7 @@ class RecipeRepositoryTest {
 
     @Test
     fun `getDetails in cache do not fetch recipeDetail from network`() = runTest {
-        coEvery { dao.getById(id = any()) } returns flowOf(RecipeDetailObjects.recipeDetailEntity)
+        coEvery { dao.getById(id = any()) } returns flowOf(RecipeDetailObjects.testRecipeDetailEntity)
         coEvery { dao.save(recipe = any()) } returns Unit
         val response = Either.Right(testRecipeDetailDTO)
         coEvery { service.getDetails(recipeId = any()) } returns response
@@ -106,8 +106,8 @@ class RecipeRepositoryTest {
     @Test
     fun `get favourite recipe should get from db successful`() = runTest {
         val entities = listOf(
-            RecipeDetailObjects.recipeDetailEntity.copy(id = 1L),
-            RecipeDetailObjects.recipeDetailEntity.copy(id = 2L),
+            RecipeDetailObjects.testRecipeDetailEntity.copy(id = 1L),
+            RecipeDetailObjects.testRecipeDetailEntity.copy(id = 2L),
         )
         coEvery { dao.getFavourites() } returns flowOf(entities)
 

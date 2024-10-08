@@ -10,7 +10,7 @@ import nl.jaysh.recipe.helper.objects.SearchRecipeObjects
 
 class FakeRecipeRemoteDataSource : RecipeRemoteDataSource {
 
-    private var searchResponse = SearchRecipeObjects.searchResponseDTO
+    private var searchResponse = SearchRecipeObjects.testSearchResponseDTO
     private var informationResponse = RecipeDetailObjects.testRecipeDetailDTO
 
     override suspend fun search(query: String): Either<Failure, SearchResponseDTO> {

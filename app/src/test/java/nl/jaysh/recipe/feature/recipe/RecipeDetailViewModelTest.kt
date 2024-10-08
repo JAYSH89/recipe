@@ -93,7 +93,7 @@ class RecipeDetailViewModelTest {
         every { repository.getDetails(recipeId = any()) } returns flow {
             emit(null)
             delay(fakeNetworkDelay)
-            emit(Either.Right(RecipeDetailObjects.recipeDetail))
+            emit(Either.Right(RecipeDetailObjects.testRecipeDetail))
         }
 
         viewModel.state.test {
