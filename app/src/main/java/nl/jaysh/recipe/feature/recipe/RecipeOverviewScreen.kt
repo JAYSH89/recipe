@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,7 +31,7 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -38,19 +39,10 @@ import nl.jaysh.recipe.R
 import nl.jaysh.recipe.core.domain.model.search.SearchResult
 import nl.jaysh.recipe.core.designsystem.theme.RecipeTheme
 import nl.jaysh.recipe.core.designsystem.theme.blue
+import nl.jaysh.recipe.core.domain.model.failure.NetworkFailure
 import nl.jaysh.recipe.core.ui.composables.RecipeAsyncImage
 import nl.jaysh.recipe.core.ui.composables.RecipeErrorLayout
 import nl.jaysh.recipe.core.ui.composables.RecipeLoadingLayout
-
-@Preview
-@Composable
-private fun RecipeOverviewScreenPreview() = RecipeTheme {
-    RecipeOverviewContent(
-        state = RecipeOverviewViewModelState(),
-        onSearch = {},
-        onSelectRecipe = {},
-    )
-}
 
 @Composable
 fun RecipeOverviewScreen(
@@ -149,7 +141,9 @@ private fun RecipeCard(recipe: SearchResult, onClick: (Long) -> Unit) = Card {
             .clickable { onClick(recipe.id) },
     ) {
         RecipeAsyncImage(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 120.dp),
             url = recipe.image,
             colorFilter = ColorFilter.tint(
                 color = blue.copy(alpha = 0.5f),
@@ -175,4 +169,50 @@ private fun RecipeCard(recipe: SearchResult, onClick: (Long) -> Unit) = Card {
             color = Color.White,
         )
     }
+}
+
+// PREVIEWS
+
+@PreviewLightDark
+@Composable
+private fun RecipeOverviewScreenLoadingPreview() = RecipeTheme {
+    RecipeOverviewContent(
+        state = RecipeOverviewViewModelState(),
+        onSearch = {},
+        onSelectRecipe = {},
+    )
+}
+
+@PreviewLightDark
+@Composable
+private fun RecipeOverviewScreenErrorPreview() = RecipeTheme {
+    RecipeOverviewContent(
+        state = RecipeOverviewViewModelState(
+            query = "Lasagna",
+            fetchedRecipes = FetchRecipeState.Error(NetworkFailure.PAYMENT_REQUIRED),
+        ),
+        onSearch = {},
+        onSelectRecipe = {},
+    )
+}
+
+@PreviewLightDark
+@Composable
+private fun RecipeOverviewScreenSuccessPreview() = RecipeTheme {
+    val searchResult = SearchResult(
+        id = 640864L,
+        title = "Crock Pot Lasagna",
+        summary = "Crock Pot Lasagna might be just the",
+        image = "https://img.spoonacular.com/recipes/640864-312x231.jpg",
+        readyInMinutes = 45,
+    )
+
+    RecipeOverviewContent(
+        state = RecipeOverviewViewModelState(
+            query = "Lasagna",
+            fetchedRecipes = FetchRecipeState.Success(List(10) { searchResult }),
+        ),
+        onSearch = {},
+        onSelectRecipe = {},
+    )
 }
