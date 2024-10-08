@@ -80,7 +80,5 @@ data class RecipeDetailViewModelState(
 sealed interface FetchRecipeDetailState {
     data object Loading : FetchRecipeDetailState
     data class Error(val failure: Failure) : FetchRecipeDetailState
-
-    @Immutable
     data class Success(val detail: RecipeDetail) : FetchRecipeDetailState
 }
