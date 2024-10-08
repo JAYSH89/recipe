@@ -5,7 +5,6 @@ import app.cash.turbine.test
 import arrow.core.Either
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -13,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.test.TestDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -44,7 +42,7 @@ class RecipeDetailViewModelTest {
     @BeforeEach
     fun setup() {
         Dispatchers.setMain(dispatcher)
-        repository = mockk()
+        repository = FakeRecipeRepository()
         savedStateHandle = SavedStateHandle(mapOf(RECIPE_DETAIL_KEY to recipeId))
         viewModel = RecipeDetailViewModel(
             repository = repository,
@@ -76,8 +74,6 @@ class RecipeDetailViewModelTest {
 
     @Test
     fun `savedStateHandle with value should set recipeId`() = runTest {
-        every { repository.getDetails(recipeId = any()) } returns emptyFlow()
-
         viewModel.state.test {
             val initialEmission = awaitItem()
             assertThat(initialEmission.recipeId).isEqualTo(recipeId)
@@ -89,29 +85,28 @@ class RecipeDetailViewModelTest {
 
     @Test
     fun `should fetch recipe detail initially`() = runTest {
-        val fakeNetworkDelay = 200L
-        every { repository.getDetails(recipeId = any()) } returns flow {
-            emit(null)
-            delay(fakeNetworkDelay)
-            emit(Either.Right(RecipeDetailObjects.testRecipeDetail))
-        }
-
         viewModel.state.test {
-            skipItems(1)
-            advanceTimeBy(fakeNetworkDelay)
+            val initialEmission = awaitItem()
+            assertThat(initialEmission.recipeId).isEqualTo(recipeId)
+            assertThat(initialEmission.fetchedRecipeDetail).isEqualTo(FetchRecipeDetailState.Loading)
+
+            advanceTimeBy(FakeRecipeRepository.FAKE_DELAY)
 
             val finalEmission = awaitItem()
+            val expected = FetchRecipeDetailState.Success(RecipeDetailObjects.testRecipeDetail)
             assertThat(finalEmission.recipeId).isEqualTo(recipeId)
-            assertThat(finalEmission.fetchedRecipeDetail).isInstanceOf(FetchRecipeDetailState.Success::class)
+            assertThat(finalEmission.fetchedRecipeDetail).isEqualTo(expected)
 
             expectNoEvents()
         }
-
-        verify(exactly = 1) { repository.getDetails(recipeId = recipeId) }
     }
 
     @Test
     fun `fetch recipe detail failure should error`() = runTest {
+        val repository = mockk<RecipeRepository>()
+        val savedStateHandle = SavedStateHandle(mapOf(RECIPE_DETAIL_KEY to recipeId))
+        val viewModel = RecipeDetailViewModel(repository, savedStateHandle)
+
         val fakeNetworkDelay = 200L
         every { repository.getDetails(recipeId = any()) } returns flow {
             emit(null)
@@ -132,5 +127,30 @@ class RecipeDetailViewModelTest {
         }
 
         verify(exactly = 1) { repository.getDetails(recipeId = recipeId) }
+    }
+
+    @Test
+    fun `set recipe favourite should update recipeDetail state`() = runTest {
+        viewModel.state.test {
+            val recipeDetail = RecipeDetailObjects.testRecipeDetail
+
+            val initialEmission = awaitItem()
+            assertThat(initialEmission.fetchedRecipeDetail).isEqualTo(FetchRecipeDetailState.Loading)
+
+            advanceTimeBy(FakeRecipeRepository.FAKE_DELAY)
+
+            val secondEmission = awaitItem()
+            assertThat(secondEmission.fetchedRecipeDetail)
+                .isEqualTo(FetchRecipeDetailState.Success(recipeDetail))
+
+            viewModel.setFavourite(recipeDetail, true)
+            advanceTimeBy(FakeRecipeRepository.FAKE_DELAY)
+
+            val finalEmission = awaitItem()
+            val expected = FetchRecipeDetailState.Success(recipeDetail.copy(favourite = true))
+            assertThat(finalEmission.fetchedRecipeDetail).isEqualTo(expected)
+
+            expectNoEvents()
+        }
     }
 }

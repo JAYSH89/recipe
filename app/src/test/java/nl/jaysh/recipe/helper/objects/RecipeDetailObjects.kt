@@ -56,6 +56,7 @@ object RecipeDetailObjects {
             )
         ),
         extendedIngredients = emptyList(),
+        favourite = false,
     )
 
     val testRecipeDetailEntity = RecipeDetailEntity(

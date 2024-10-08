@@ -79,7 +79,7 @@ fun RecipeDetailScreen(
 private fun RecipeDetailScreenContent(
     state: RecipeDetailViewModelState,
     onClickBack: () -> Unit,
-    onClickFavourite: (Long, Boolean) -> Unit,
+    onClickFavourite: (RecipeDetail, Boolean) -> Unit,
 ) {
     when (state.fetchedRecipeDetail) {
         FetchRecipeDetailState.Loading -> RecipeLoadingLayout(
@@ -103,7 +103,7 @@ private fun RecipeDetailScreenContent(
 private fun RecipeDetailContent(
     recipeDetail: RecipeDetail,
     onClickBack: () -> Unit,
-    onClickFavourite: (Long, Boolean) -> Unit,
+    onClickFavourite: (RecipeDetail, Boolean) -> Unit,
 ) {
     Column {
         RecipeDetailTopBar(
@@ -151,7 +151,7 @@ private fun RecipeDetailContent(
 private fun RecipeDetailTopBar(
     recipeDetail: RecipeDetail,
     onClickBack: () -> Unit,
-    onClickFavourite: (Long, Boolean) -> Unit,
+    onClickFavourite: (RecipeDetail, Boolean) -> Unit,
 ) = Row(
     modifier = Modifier
         .fillMaxWidth()
@@ -171,7 +171,7 @@ private fun RecipeDetailTopBar(
 
     val isFavourite = recipeDetail.favourite ?: false
     IconButton(
-        onClick = { onClickFavourite(recipeDetail.id, !isFavourite) },
+        onClick = { onClickFavourite(recipeDetail, !isFavourite) },
         content = {
             Icon(
                 painter = if (isFavourite) painterResource(R.drawable.heart)

@@ -21,6 +21,7 @@ import kotlinx.coroutines.test.setMain
 import nl.jaysh.recipe.core.domain.RecipeRepository
 import nl.jaysh.recipe.core.domain.model.failure.NetworkFailure
 import nl.jaysh.recipe.helper.FakeRecipeRepository
+import nl.jaysh.recipe.helper.objects.SearchRecipeObjects
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -54,7 +55,7 @@ class RecipeOverviewViewModelTest {
             assertThat(initialEmission).isEqualTo(initialState)
 
             val successEmission = awaitItem()
-            val success = FetchRecipeState.Success(recipes = emptyList())
+            val success = FetchRecipeState.Success(SearchRecipeObjects.testSearchResults)
             val successState = initialState.copy(fetchedRecipes = success)
             assertThat(successEmission).isEqualTo(successState)
 
@@ -106,7 +107,9 @@ class RecipeOverviewViewModelTest {
             val finalEmission = awaitItem()
             val finalState = RecipeOverviewViewModelState(
                 query = "Ginger",
-                fetchedRecipes = FetchRecipeState.Success(recipes = emptyList()),
+                fetchedRecipes = FetchRecipeState.Success(
+                    recipes = SearchRecipeObjects.testSearchResults
+                ),
             )
             assertThat(finalEmission).isEqualTo(finalState)
 
