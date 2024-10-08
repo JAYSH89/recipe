@@ -5,21 +5,25 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
+import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +43,7 @@ import nl.jaysh.recipe.R
 import nl.jaysh.recipe.core.domain.model.search.SearchResult
 import nl.jaysh.recipe.core.designsystem.theme.RecipeTheme
 import nl.jaysh.recipe.core.designsystem.theme.blue
+import nl.jaysh.recipe.core.designsystem.theme.orange
 import nl.jaysh.recipe.core.domain.model.failure.NetworkFailure
 import nl.jaysh.recipe.core.ui.composables.RecipeAsyncImage
 import nl.jaysh.recipe.core.ui.composables.RecipeErrorLayout
@@ -70,19 +75,15 @@ private fun RecipeOverviewContent(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
-
-        val colors = TextFieldDefaults.colors(
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent,
-        )
-
         TextField(
             modifier = Modifier.fillMaxWidth(),
             value = input,
-            colors = colors,
+            colors = TextFieldDefaults.colors(
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+            ),
             leadingIcon = {
                 Icon(
                     painter = painterResource(R.drawable.search),
@@ -114,27 +115,78 @@ private fun RecipeOverviewContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun History(
+    modifier: Modifier = Modifier,
+    searchResults: List<SearchResult>,
+) {
+    val state = rememberCarouselState { searchResults.size }
+
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(
+            text = "History",
+            style = MaterialTheme.typography.labelLarge,
+            color = orange,
+        )
+
+        HorizontalMultiBrowseCarousel(
+            state = state,
+            preferredItemWidth = 200.dp,
+            itemSpacing = 10.dp,
+        ) { page ->
+            Card(
+                modifier = Modifier
+                    .size(200.dp)
+                    .maskClip(MaterialTheme.shapes.extraLarge),
+                elevation = CardDefaults.cardElevation(8.dp),
+            ) {
+                RecipeAsyncImage(
+                    modifier = Modifier.fillMaxSize(),
+                    url = searchResults[page].image,
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun RecipeOverview(
     modifier: Modifier = Modifier,
     searchResults: List<SearchResult>,
     onSelectRecipe: (Long) -> Unit,
-) = LazyVerticalGrid(
-    columns = GridCells.Fixed(2),
-    verticalArrangement = Arrangement.spacedBy(8.dp),
-    horizontalArrangement = Arrangement.spacedBy(8.dp),
-    contentPadding = PaddingValues(vertical = 16.dp),
 ) {
-    items(searchResults) { recipe ->
-        RecipeCard(
-            recipe = recipe,
-            onClick = onSelectRecipe,
-        )
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(bottom = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        item(span = { GridItemSpan(2) }) {
+            History(searchResults = searchResults)
+        }
+
+        item(span = { GridItemSpan(2) }) {
+            Text(
+                text = "Search",
+                style = MaterialTheme.typography.labelLarge,
+                color = orange,
+            )
+        }
+
+        items(searchResults) { recipe ->
+            RecipeCard(
+                recipe = recipe,
+                onClick = onSelectRecipe,
+            )
+        }
     }
 }
 
 @Composable
-private fun RecipeCard(recipe: SearchResult, onClick: (Long) -> Unit) = Card {
+private fun RecipeCard(recipe: SearchResult, onClick: (Long) -> Unit) = Card(
+    elevation = CardDefaults.cardElevation(8.dp),
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()

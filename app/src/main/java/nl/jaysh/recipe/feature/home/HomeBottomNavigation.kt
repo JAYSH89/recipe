@@ -48,7 +48,7 @@ fun HomeBottomNavigation(navController: NavHostController) {
         NavigationBar(
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface,
-            tonalElevation = 4.dp,
+            tonalElevation = 8.dp,
         ) {
             navigationBarItems.forEach { navigationBarItemContent ->
                 BottomNavigationItem(
