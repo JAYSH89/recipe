@@ -1,6 +1,6 @@
 package nl.jaysh.recipe.core.domain.model.search
 
-data class SearchRecipeResult(
+data class SearchResult(
     val id: Long,
     val title: String,
     val summary: String,

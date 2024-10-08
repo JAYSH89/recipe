@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import nl.jaysh.recipe.R
-import nl.jaysh.recipe.core.domain.model.search.SearchRecipeResult
+import nl.jaysh.recipe.core.domain.model.search.SearchResult
 import nl.jaysh.recipe.core.designsystem.theme.RecipeTheme
 import nl.jaysh.recipe.core.designsystem.theme.blue
 import nl.jaysh.recipe.core.ui.composables.RecipeAsyncImage
@@ -125,7 +125,7 @@ private fun RecipeOverviewContent(
 @Composable
 private fun RecipeOverview(
     modifier: Modifier = Modifier,
-    searchResults: List<SearchRecipeResult>,
+    searchResults: List<SearchResult>,
     onSelectRecipe: (Long) -> Unit,
 ) = LazyVerticalGrid(
     columns = GridCells.Fixed(2),
@@ -142,7 +142,7 @@ private fun RecipeOverview(
 }
 
 @Composable
-private fun RecipeCard(recipe: SearchRecipeResult, onClick: (Long) -> Unit) = Card {
+private fun RecipeCard(recipe: SearchResult, onClick: (Long) -> Unit) = Card {
     Box(
         modifier = Modifier
             .fillMaxSize()

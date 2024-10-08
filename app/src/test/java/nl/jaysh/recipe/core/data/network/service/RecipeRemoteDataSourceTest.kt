@@ -31,9 +31,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 
-class RecipeServiceTest {
+class RecipeRemoteDataSourceTest {
 
-    private lateinit var recipeService: RecipeService
+    private lateinit var remoteDataSource: RecipeRemoteDataSource
     private lateinit var httpClient: HttpClient
     private lateinit var engine: MockEngine
 
@@ -44,7 +44,7 @@ class RecipeServiceTest {
     fun setup() {
         engine = MockHttpEngine.successEngine
         httpClient = KtorClient.createHttpClient(engine)
-        recipeService = RecipeServiceImpl(httpClient = httpClient)
+        remoteDataSource = RecipeRemoteDataSourceImpl(httpClient = httpClient)
     }
 
     @AfterEach
@@ -54,7 +54,7 @@ class RecipeServiceTest {
 
     @Test
     fun testSearchRecipesPath() = runTest {
-        recipeService.searchRecipes(query = testQuery)
+        remoteDataSource.search(query = testQuery)
 
         verifyHttpRequest { path ->
             assertThat(path).contains("/recipes/complexSearch?query=$testQuery")
@@ -65,7 +65,7 @@ class RecipeServiceTest {
 
     @Test
     fun testFetchRecipeDetailPath() = runTest {
-        recipeService.fetchRecipeDetail(recipeId = testRecipeId)
+        remoteDataSource.getDetails(recipeId = testRecipeId)
 
         verifyHttpRequest { path ->
             assertThat(path).contains("/recipes/$testRecipeId")
@@ -76,9 +76,7 @@ class RecipeServiceTest {
 
     @Test
     fun testSearchRecipesSuccess() = runTest {
-        val response = recipeService.searchRecipes(query = testQuery)
-
-        assert(response.isRight())
+        val response = remoteDataSource.search(query = testQuery)
 
         val result = response.getOrNull() ?: throw Exception()
         assertThat(result.results.size).isEqualTo(3)
@@ -93,9 +91,8 @@ class RecipeServiceTest {
 
     @Test
     fun testFetchRecipeDetailSuccess() = runTest {
-        val response = recipeService.fetchRecipeDetail(recipeId = testRecipeId)
+        val response = remoteDataSource.getDetails(recipeId = testRecipeId)
 
-        assert(response.isRight())
         val result = response.getOrNull() ?: throw Exception()
 
         assertThat(result.title).isEqualTo("Crock Pot Lasagna")
@@ -105,29 +102,29 @@ class RecipeServiceTest {
     }
 
     @Test
-    fun `searchRecipes serialization error should ParseFailure`() = runTest {
+    fun `search serialization error should ParseFailure`() = runTest {
         val jsonObject = JsonObject(mapOf("invalid" to JsonPrimitive("json")))
         val content = Json.encodeToString(jsonObject)
 
         val engine = MockEngine { respond(content = content, status = HttpStatusCode.OK) }
         val client = KtorClient.createHttpClient(engine)
-        val service = RecipeServiceImpl(httpClient = client)
+        val service = RecipeRemoteDataSourceImpl(httpClient = client)
 
-        val response = service.searchRecipes(query = testQuery)
+        val response = service.search(query = testQuery)
 
         assertThat(response.leftOrNull()).isEqualTo(ParseFailure.JsonParse)
     }
 
     @Test
-    fun `recipeDetail serialization error should ParseFailure`() = runTest {
+    fun `getDetail serialization error should ParseFailure`() = runTest {
         val jsonObject = JsonObject(mapOf("invalid" to JsonPrimitive("json")))
         val content = Json.encodeToString(jsonObject)
 
         val engine = MockEngine { respond(content = content, status = HttpStatusCode.OK) }
         val client = KtorClient.createHttpClient(engine)
-        val service = RecipeServiceImpl(httpClient = client)
+        val service = RecipeRemoteDataSourceImpl(httpClient = client)
 
-        val response = service.fetchRecipeDetail(recipeId = testRecipeId)
+        val response = service.getDetails(recipeId = testRecipeId)
 
         assertThat(response.leftOrNull()).isEqualTo(ParseFailure.JsonParse)
     }
@@ -215,8 +212,8 @@ class RecipeServiceTest {
     private fun testFailureWithStatusCode(statusCode: Int, expectedFailure: Failure) = runTest {
         val service = failingRecipeServiceWithStatusCode(statusCode = statusCode)
 
-        val search = service.searchRecipes(query = testQuery)
-        val detail = service.fetchRecipeDetail(recipeId = testRecipeId)
+        val search = service.search(query = testQuery)
+        val detail = service.getDetails(recipeId = testRecipeId)
 
         assertThat(search.leftOrNull()).isEqualTo(expectedFailure)
         assertThat(detail.leftOrNull()).isEqualTo(expectedFailure)
@@ -226,19 +223,19 @@ class RecipeServiceTest {
     private fun testFailureWithException(exception: Exception, expectedFailure: Failure) = runTest {
         val engine = MockEngine { _ -> throw exception }
         val client = KtorClient.createHttpClient(engine)
-        val service = RecipeServiceImpl(httpClient = client)
+        val service = RecipeRemoteDataSourceImpl(httpClient = client)
 
-        val search = service.searchRecipes(query = testQuery)
-        val detail = service.fetchRecipeDetail(recipeId = testRecipeId)
+        val search = service.search(query = testQuery)
+        val detail = service.getDetails(recipeId = testRecipeId)
 
         assertThat(search.leftOrNull()).isEqualTo(expectedFailure)
         assertThat(detail.leftOrNull()).isEqualTo(expectedFailure)
     }
 
-    private fun failingRecipeServiceWithStatusCode(statusCode: Int): RecipeServiceImpl {
+    private fun failingRecipeServiceWithStatusCode(statusCode: Int): RecipeRemoteDataSourceImpl {
         val status = HttpStatusCode.fromValue(statusCode)
         val engine = MockEngine { respond(content = "", status = status) }
         val client = KtorClient.createHttpClient(engine)
-        return RecipeServiceImpl(httpClient = client)
+        return RecipeRemoteDataSourceImpl(httpClient = client)
     }
 }

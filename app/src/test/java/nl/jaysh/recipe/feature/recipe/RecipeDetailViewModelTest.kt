@@ -76,7 +76,7 @@ class RecipeDetailViewModelTest {
 
     @Test
     fun `savedStateHandle with value should set recipeId`() = runTest {
-        every { repository.fetchRecipeDetail(recipeId = any()) } returns emptyFlow()
+        every { repository.getDetails(recipeId = any()) } returns emptyFlow()
 
         viewModel.state.test {
             val initialEmission = awaitItem()
@@ -90,7 +90,7 @@ class RecipeDetailViewModelTest {
     @Test
     fun `should fetch recipe detail initially`() = runTest {
         val fakeNetworkDelay = 200L
-        every { repository.fetchRecipeDetail(recipeId = any()) } returns flow {
+        every { repository.getDetails(recipeId = any()) } returns flow {
             emit(null)
             delay(fakeNetworkDelay)
             emit(Either.Right(RecipeDetailObjects.recipeDetail))
@@ -107,13 +107,13 @@ class RecipeDetailViewModelTest {
             expectNoEvents()
         }
 
-        verify(exactly = 1) { repository.fetchRecipeDetail(recipeId = recipeId) }
+        verify(exactly = 1) { repository.getDetails(recipeId = recipeId) }
     }
 
     @Test
     fun `fetch recipe detail failure should error`() = runTest {
         val fakeNetworkDelay = 200L
-        every { repository.fetchRecipeDetail(recipeId = any()) } returns flow {
+        every { repository.getDetails(recipeId = any()) } returns flow {
             emit(null)
             delay(fakeNetworkDelay)
             emit(Either.Left(NetworkFailure.UNAUTHORIZED))
@@ -131,6 +131,6 @@ class RecipeDetailViewModelTest {
             expectNoEvents()
         }
 
-        verify(exactly = 1) { repository.fetchRecipeDetail(recipeId = recipeId) }
+        verify(exactly = 1) { repository.getDetails(recipeId = recipeId) }
     }
 }

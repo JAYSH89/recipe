@@ -55,7 +55,7 @@ class RecipeDetailViewModel @Inject constructor(
         emit(newState)
 
         repository
-            .fetchRecipeDetail(recipeId)
+            .getDetails(recipeId)
             .collect { recipeDetail ->
                 recipeDetail?.let {
                     it.fold(
