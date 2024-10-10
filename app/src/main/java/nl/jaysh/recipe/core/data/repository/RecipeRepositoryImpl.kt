@@ -49,7 +49,11 @@ class RecipeRepositoryImpl @Inject constructor(
         }.flowOn(context = dispatcher)
     }
 
-    override fun getDetails(recipeId: Long): Flow<Either<Failure, RecipeDetail>> {
+    override fun getDetails(): Flow<Either<Failure, List<RecipeDetail>>> {
+        return dao.getRecipes().map(::convertToRecipeDetailList)
+    }
+
+    override fun getDetailsById(recipeId: Long): Flow<Either<Failure, RecipeDetail>> {
         return dao.getById(id = recipeId).map { recipeEntity ->
             recipeEntity
                 ?.let { convertToRecipeDetail(it) }

@@ -8,7 +8,8 @@ import nl.jaysh.recipe.core.domain.model.search.SearchResult
 
 interface RecipeRepository {
     fun search(query: String): Flow<Either<Failure, List<SearchResult>>>
-    fun getDetails(recipeId: Long): Flow<Either<Failure, RecipeDetail>?>
+    fun getDetails(): Flow<Either<Failure, List<RecipeDetail>>>
+    fun getDetailsById(recipeId: Long): Flow<Either<Failure, RecipeDetail>?>
     suspend fun setFavouriteRecipe(recipe: RecipeDetail, isFavourite: Boolean)
     fun getFavouriteRecipe(): Flow<Either<Failure, List<RecipeDetail>>>
 }

@@ -108,7 +108,7 @@ class RecipeDetailViewModelTest {
         val viewModel = RecipeDetailViewModel(repository, savedStateHandle)
 
         val fakeNetworkDelay = 200L
-        every { repository.getDetails(recipeId = any()) } returns flow {
+        every { repository.getDetailsById(recipeId = any()) } returns flow {
             emit(null)
             delay(fakeNetworkDelay)
             emit(Either.Left(NetworkFailure.UNAUTHORIZED))
@@ -126,7 +126,7 @@ class RecipeDetailViewModelTest {
             expectNoEvents()
         }
 
-        verify(exactly = 1) { repository.getDetails(recipeId = recipeId) }
+        verify(exactly = 1) { repository.getDetailsById(recipeId = recipeId) }
     }
 
     @Test

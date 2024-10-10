@@ -2,6 +2,7 @@ package nl.jaysh.recipe.feature.recipe
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arrow.core.Either
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -10,17 +11,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import nl.jaysh.recipe.core.domain.RecipeRepository
+import nl.jaysh.recipe.core.domain.model.detail.RecipeDetail
 import nl.jaysh.recipe.core.domain.model.failure.Failure
 import nl.jaysh.recipe.core.domain.model.search.SearchResult
-import nl.jaysh.recipe.feature.recipe.FetchRecipeState.Error
-import nl.jaysh.recipe.feature.recipe.FetchRecipeState.Loading
-import nl.jaysh.recipe.feature.recipe.FetchRecipeState.Success
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -35,7 +35,8 @@ class RecipeOverviewViewModel @Inject constructor(
     val state: StateFlow<RecipeOverviewViewModelState> = searchQuery
         .asStateFlow()
         .debounce(500L)
-        .flatMapLatest(::fetchRecipes)
+        .flatMapLatest(::searchRecipes)
+        .combine(repository.getDetails(), transform = ::mapDetails)
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5_000),
@@ -46,8 +47,8 @@ class RecipeOverviewViewModel @Inject constructor(
         searchQuery.update { query }
     }
 
-    private fun fetchRecipes(query: String): Flow<RecipeOverviewViewModelState> = flow {
-        val newState = RecipeOverviewViewModelState(query, Loading)
+    private fun searchRecipes(query: String): Flow<RecipeOverviewViewModelState> = flow {
+        val newState = RecipeOverviewViewModelState(query, SearchRecipeState.Loading)
         emit(newState)
 
         repository
@@ -55,25 +56,68 @@ class RecipeOverviewViewModel @Inject constructor(
             .collect { result ->
                 result.fold(
                     ifLeft = { failure ->
-                        val error = Error(failure)
-                        emit(newState.copy(fetchedRecipes = error))
+                        val error = SearchRecipeState.Error(failure)
+                        emit(newState.copy(searchResults = error))
                     },
                     ifRight = { recipes ->
-                        val fetchedRecipes = Success(recipes)
-                        emit(newState.copy(fetchedRecipes = fetchedRecipes))
+                        val searchResults = SearchRecipeState.Success(recipes)
+                        emit(newState.copy(searchResults = searchResults))
                     },
                 )
             }
     }
+
+    private fun mapDetails(
+        currentState: RecipeOverviewViewModelState,
+        historyResult: Either<Failure, List<RecipeDetail>>,
+    ): RecipeOverviewViewModelState = historyResult.fold(
+        ifLeft = { failure ->
+            val error = HistoryState.Error(failure = failure)
+            currentState.copy(recipeHistory = error)
+        },
+        ifRight = { history ->
+            val recipeHistory = HistoryState.Success(history = history)
+            currentState.copy(recipeHistory = recipeHistory)
+        },
+    )
+
+//    private fun mapDetailsTheSecond(
+//        currentState: RecipeOverviewViewModelState,
+//        historyResult: Either<Failure, List<RecipeDetail>>,
+//    ): RecipeOverviewViewModelState {
+//        historyResult.fold(
+//            ifLeft = { failure ->
+//                val error = FetchState.Error(failure = failure)
+//                currentState.copy(fetcher = error)
+//            },
+//            ifRight = { history ->
+//                val recipeHistory = FetchState.Success<List<RecipeDetail>>(values = history)
+//                currentState.copy(fetcher = recipeHistory)
+//            },
+//    }
 }
 
 data class RecipeOverviewViewModelState(
     val query: String = "",
-    val fetchedRecipes: FetchRecipeState = Loading,
+    val searchResults: SearchRecipeState = SearchRecipeState.Loading,
+    val recipeHistory: HistoryState = HistoryState.NoHistory,
+//    val fetcher: FetchState = FetchState.Initial,
 )
 
-sealed interface FetchRecipeState {
-    data object Loading : FetchRecipeState
-    data class Error(val failure: Failure) : FetchRecipeState
-    data class Success(val recipes: List<SearchResult>) : FetchRecipeState
+sealed interface SearchRecipeState {
+    data object Loading : SearchRecipeState
+    data class Error(val failure: Failure) : SearchRecipeState
+    data class Success(val recipes: List<SearchResult>) : SearchRecipeState
 }
+
+sealed interface HistoryState {
+    data object NoHistory : HistoryState
+    data class Error(val failure: Failure) : HistoryState
+    data class Success(val history: List<RecipeDetail>) : HistoryState
+}
+
+//sealed interface FetchState {
+//    data object Initial : FetchState
+//    data class Error(val failure: Failure) : FetchState
+//    data class Success<T>(val values: T) : FetchState
+//}

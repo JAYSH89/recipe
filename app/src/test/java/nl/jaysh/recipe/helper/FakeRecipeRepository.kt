@@ -27,7 +27,16 @@ class FakeRecipeRepository : RecipeRepository {
         }
     }
 
-    override fun getDetails(recipeId: Long): Flow<Either<Failure, RecipeDetail>?> {
+    override fun getDetails(): Flow<Either<Failure, List<RecipeDetail>>> {
+        return flow {
+            delay(FAKE_DELAY)
+            val recipeDetails = List(size = 10) { RecipeDetailObjects.testRecipeDetail }
+
+            emit(Either.Right(recipeDetails))
+        }
+    }
+
+    override fun getDetailsById(recipeId: Long): Flow<Either<Failure, RecipeDetail>?> {
         return recipeDetail.map { Either.Right(it) }
             .onEach { delay(FAKE_DELAY) }
     }

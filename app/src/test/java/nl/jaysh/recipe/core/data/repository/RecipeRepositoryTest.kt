@@ -60,7 +60,7 @@ class RecipeRepositoryTest {
         val response = Either.Right(testRecipeDetailDTO)
         coEvery { service.getDetails(recipeId = any()) } returns response
 
-        repository.getDetails(recipeId = testRecipeId).first()
+        repository.getDetailsById(recipeId = testRecipeId).first()
 
         coVerify(exactly = 1) { dao.getById(id = testRecipeId) }
         coVerify(exactly = 1) { service.getDetails(recipeId = any()) }
@@ -74,7 +74,7 @@ class RecipeRepositoryTest {
         val response = Either.Right(testRecipeDetailDTO)
         coEvery { service.getDetails(recipeId = any()) } returns response
 
-        repository.getDetails(recipeId = testRecipeId).first()
+        repository.getDetailsById(recipeId = testRecipeId).first()
 
         coVerify(exactly = 1) { dao.getById(id = testRecipeId) }
         coVerify(exactly = 0) { service.getDetails(recipeId = any()) }
@@ -88,7 +88,7 @@ class RecipeRepositoryTest {
         coEvery { service.getDetails(recipeId = any()) } returns successResponse
         coEvery { dao.save(recipe = any()) } throws RuntimeException()
 
-        val result = repository.getDetails(recipeId = testRecipeId).first()
+        val result = repository.getDetailsById(recipeId = testRecipeId).first()
         assertThat(result?.leftOrNull()).isEqualTo(StorageFailure.IO)
 
         coVerify(exactly = 1) { dao.save(any()) }

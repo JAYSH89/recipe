@@ -10,6 +10,9 @@ import nl.jaysh.recipe.core.data.local.room.entity.RecipeDetailEntity
 
 @Dao
 interface RecipeDetailDao {
+    @Query("SELECT * FROM recipe ORDER BY updated_at DESC LIMIT 10")
+    fun getRecipes(): Flow<List<RecipeDetailEntity>>
+
     @Query("SELECT * FROM recipe WHERE id = :id")
     fun getById(id: Long): Flow<RecipeDetailEntity?>
 

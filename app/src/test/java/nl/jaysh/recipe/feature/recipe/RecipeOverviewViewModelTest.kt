@@ -55,8 +55,8 @@ class RecipeOverviewViewModelTest {
             assertThat(initialEmission).isEqualTo(initialState)
 
             val successEmission = awaitItem()
-            val success = FetchRecipeState.Success(SearchRecipeObjects.testSearchResults)
-            val successState = initialState.copy(fetchedRecipes = success)
+            val success = SearchRecipeState.Success(SearchRecipeObjects.testSearchResults)
+            val successState = initialState.copy(searchResults = success)
             assertThat(successEmission).isEqualTo(successState)
 
             expectNoEvents()
@@ -79,8 +79,8 @@ class RecipeOverviewViewModelTest {
             assertThat(initialEmission).isEqualTo(initialState)
 
             val failureEmission = awaitItem()
-            val expectedFailure = FetchRecipeState.Error(NetworkFailure.UNAUTHORIZED)
-            val failureState = initialState.copy(fetchedRecipes = expectedFailure)
+            val expectedFailure = SearchRecipeState.Error(NetworkFailure.UNAUTHORIZED)
+            val failureState = initialState.copy(searchResults = expectedFailure)
             assertThat(failureEmission).isEqualTo(failureState)
 
             expectNoEvents()
@@ -100,14 +100,14 @@ class RecipeOverviewViewModelTest {
             val searchEmission = awaitItem()
             val searchLoadingState = RecipeOverviewViewModelState(
                 query = "Ginger",
-                fetchedRecipes = FetchRecipeState.Loading,
+                searchResults = SearchRecipeState.Loading,
             )
             assertThat(searchEmission).isEqualTo(searchLoadingState)
 
             val finalEmission = awaitItem()
             val finalState = RecipeOverviewViewModelState(
                 query = "Ginger",
-                fetchedRecipes = FetchRecipeState.Success(
+                searchResults = SearchRecipeState.Success(
                     recipes = SearchRecipeObjects.testSearchResults
                 ),
             )

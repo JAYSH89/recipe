@@ -1,5 +1,6 @@
 package nl.jaysh.recipe.feature.recipe
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -74,7 +77,7 @@ private fun RecipeOverviewContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .padding(start = 16.dp, top = 16.dp, end = 16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         TextField(
@@ -97,18 +100,19 @@ private fun RecipeOverviewContent(
             },
         )
 
-        when (state.fetchedRecipes) {
-            FetchRecipeState.Loading -> RecipeLoadingLayout(
+        when (state.searchResults) {
+            SearchRecipeState.Loading -> RecipeLoadingLayout(
                 modifier = Modifier.fillMaxSize(),
             )
 
-            is FetchRecipeState.Error -> RecipeErrorLayout(
+            is SearchRecipeState.Error -> RecipeErrorLayout(
                 modifier = Modifier.fillMaxSize(),
-                failure = state.fetchedRecipes.failure,
+                failure = state.searchResults.failure,
             )
 
-            is FetchRecipeState.Success -> RecipeOverview(
-                searchResults = state.fetchedRecipes.recipes,
+            is SearchRecipeState.Success -> RecipeOverview(
+                searchResults = state.searchResults.recipes,
+                historyState = state.recipeHistory,
                 onSelectRecipe = onSelectRecipe,
             )
         }
@@ -119,32 +123,51 @@ private fun RecipeOverviewContent(
 @Composable
 private fun History(
     modifier: Modifier = Modifier,
-    searchResults: List<SearchResult>,
+    historyState: HistoryState,
+    onSelectRecipe: (Long) -> Unit,
 ) {
-    val state = rememberCarouselState { searchResults.size }
+    if (historyState is HistoryState.Success) {
+        val state = rememberCarouselState { historyState.history.size }
 
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text(
-            text = "History",
-            style = MaterialTheme.typography.labelLarge,
-            color = orange,
-        )
-
-        HorizontalMultiBrowseCarousel(
-            state = state,
-            preferredItemWidth = 200.dp,
-            itemSpacing = 10.dp,
-        ) { page ->
-            Card(
-                modifier = Modifier
-                    .size(200.dp)
-                    .maskClip(MaterialTheme.shapes.extraLarge),
-                elevation = CardDefaults.cardElevation(8.dp),
-            ) {
-                RecipeAsyncImage(
-                    modifier = Modifier.fillMaxSize(),
-                    url = searchResults[page].image,
+        AnimatedVisibility(visible = historyState.history.isNotEmpty()) {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(
+                    text = "History",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = orange,
                 )
+
+                HorizontalMultiBrowseCarousel(
+                    state = state,
+                    preferredItemWidth = 200.dp,
+                    itemSpacing = 12.dp,
+                ) { page ->
+                    Box(
+                        modifier = Modifier
+                            .size(200.dp)
+                            .clip(RoundedCornerShape(16.dp))
+                            .maskClip(MaterialTheme.shapes.extraLarge)
+                            .clickable { onSelectRecipe(historyState.history[page].id) },
+                    ) {
+                        RecipeAsyncImage(
+                            modifier = Modifier.fillMaxSize(),
+                            url = historyState.history[page].image,
+                            colorFilter = ColorFilter.tint(
+                                color = blue.copy(alpha = 0.5f),
+                                blendMode = BlendMode.SrcAtop,
+                            ),
+                        )
+
+                        Text(
+                            modifier = Modifier
+                                .padding(12.dp)
+                                .align(Alignment.BottomStart),
+                            text = historyState.history[page].title,
+                            style = MaterialTheme.typography.labelMedium,
+                            color = Color.White
+                        )
+                    }
+                }
             }
         }
     }
@@ -154,6 +177,7 @@ private fun History(
 private fun RecipeOverview(
     modifier: Modifier = Modifier,
     searchResults: List<SearchResult>,
+    historyState: HistoryState,
     onSelectRecipe: (Long) -> Unit,
 ) {
     LazyVerticalGrid(
@@ -163,7 +187,10 @@ private fun RecipeOverview(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item(span = { GridItemSpan(2) }) {
-            History(searchResults = searchResults)
+            History(
+                historyState = historyState,
+                onSelectRecipe = onSelectRecipe,
+            )
         }
 
         item(span = { GridItemSpan(2) }) {
@@ -241,7 +268,7 @@ private fun RecipeOverviewScreenErrorPreview() = RecipeTheme {
     RecipeOverviewContent(
         state = RecipeOverviewViewModelState(
             query = "Lasagna",
-            fetchedRecipes = FetchRecipeState.Error(NetworkFailure.PAYMENT_REQUIRED),
+            searchResults = SearchRecipeState.Error(NetworkFailure.PAYMENT_REQUIRED),
         ),
         onSearch = {},
         onSelectRecipe = {},
@@ -262,7 +289,7 @@ private fun RecipeOverviewScreenSuccessPreview() = RecipeTheme {
     RecipeOverviewContent(
         state = RecipeOverviewViewModelState(
             query = "Lasagna",
-            fetchedRecipes = FetchRecipeState.Success(List(10) { searchResult }),
+            searchResults = SearchRecipeState.Success(List(10) { searchResult }),
         ),
         onSearch = {},
         onSelectRecipe = {},
