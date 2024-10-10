@@ -24,6 +24,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.carousel.CarouselState
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
@@ -47,6 +48,7 @@ import nl.jaysh.recipe.core.domain.model.search.SearchResult
 import nl.jaysh.recipe.core.designsystem.theme.RecipeTheme
 import nl.jaysh.recipe.core.designsystem.theme.blue
 import nl.jaysh.recipe.core.designsystem.theme.orange
+import nl.jaysh.recipe.core.domain.model.detail.RecipeDetail
 import nl.jaysh.recipe.core.domain.model.failure.NetworkFailure
 import nl.jaysh.recipe.core.ui.composables.RecipeAsyncImage
 import nl.jaysh.recipe.core.ui.composables.RecipeErrorLayout
@@ -58,9 +60,12 @@ fun RecipeOverviewScreen(
     onSelectRecipe: (Long) -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    // TODO MERGE WITH OTHER FLOW?
+    val history by viewModel.history.collectAsStateWithLifecycle()
 
     RecipeOverviewContent(
         state = state,
+        history = history,
         onSearch = viewModel::onSearch,
         onSelectRecipe = onSelectRecipe,
     )
@@ -69,6 +74,7 @@ fun RecipeOverviewScreen(
 @Composable
 private fun RecipeOverviewContent(
     state: RecipeOverviewViewModelState,
+    history: HistoryState,
     onSearch: (String) -> Unit,
     onSelectRecipe: (Long) -> Unit,
 ) {
@@ -112,63 +118,9 @@ private fun RecipeOverviewContent(
 
             is SearchRecipeState.Success -> RecipeOverview(
                 searchResults = state.searchResults.recipes,
-                historyState = state.recipeHistory,
+                history = history,
                 onSelectRecipe = onSelectRecipe,
             )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun History(
-    modifier: Modifier = Modifier,
-    historyState: HistoryState,
-    onSelectRecipe: (Long) -> Unit,
-) {
-    if (historyState is HistoryState.Success) {
-        val state = rememberCarouselState { historyState.history.size }
-
-        AnimatedVisibility(visible = historyState.history.isNotEmpty()) {
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text(
-                    text = "History",
-                    style = MaterialTheme.typography.labelLarge,
-                    color = orange,
-                )
-
-                HorizontalMultiBrowseCarousel(
-                    state = state,
-                    preferredItemWidth = 200.dp,
-                    itemSpacing = 12.dp,
-                ) { page ->
-                    Box(
-                        modifier = Modifier
-                            .size(200.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .maskClip(MaterialTheme.shapes.extraLarge)
-                            .clickable { onSelectRecipe(historyState.history[page].id) },
-                    ) {
-                        RecipeAsyncImage(
-                            modifier = Modifier.fillMaxSize(),
-                            url = historyState.history[page].image,
-                            colorFilter = ColorFilter.tint(
-                                color = blue.copy(alpha = 0.5f),
-                                blendMode = BlendMode.SrcAtop,
-                            ),
-                        )
-
-                        Text(
-                            modifier = Modifier
-                                .padding(12.dp)
-                                .align(Alignment.BottomStart),
-                            text = historyState.history[page].title,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = Color.White
-                        )
-                    }
-                }
-            }
         }
     }
 }
@@ -177,7 +129,7 @@ private fun History(
 private fun RecipeOverview(
     modifier: Modifier = Modifier,
     searchResults: List<SearchResult>,
-    historyState: HistoryState,
+    history: HistoryState,
     onSelectRecipe: (Long) -> Unit,
 ) {
     LazyVerticalGrid(
@@ -187,10 +139,9 @@ private fun RecipeOverview(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         item(span = { GridItemSpan(2) }) {
-            History(
-                historyState = historyState,
-                onSelectRecipe = onSelectRecipe,
-            )
+            if (history is HistoryState.Success && history.history.isNotEmpty()) {
+                History(history = history.history, onSelectRecipe = onSelectRecipe)
+            }
         }
 
         item(span = { GridItemSpan(2) }) {
@@ -206,6 +157,54 @@ private fun RecipeOverview(
                 recipe = recipe,
                 onClick = onSelectRecipe,
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun History(
+    modifier: Modifier = Modifier,
+    history: List<RecipeDetail>,
+    onSelectRecipe: (Long) -> Unit,
+) = AnimatedVisibility(visible = history.isNotEmpty()) {
+    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Text(
+            text = "History",
+            style = MaterialTheme.typography.labelLarge,
+            color = orange,
+        )
+
+        HorizontalMultiBrowseCarousel(
+            state = CarouselState(currentItem = 0, itemCount = { history.size }),
+            preferredItemWidth = 200.dp,
+            itemSpacing = 12.dp,
+        ) { page ->
+            Box(
+                modifier = Modifier
+                    .size(200.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .maskClip(MaterialTheme.shapes.extraLarge)
+                    .clickable { onSelectRecipe(history[page].id) },
+            ) {
+                RecipeAsyncImage(
+                    modifier = Modifier.fillMaxSize(),
+                    url = history[page].image,
+                    colorFilter = ColorFilter.tint(
+                        color = blue.copy(alpha = 0.5f),
+                        blendMode = BlendMode.SrcAtop,
+                    ),
+                )
+
+                Text(
+                    modifier = Modifier
+                        .padding(12.dp)
+                        .align(Alignment.BottomStart),
+                    text = history[page].title,
+                    style = MaterialTheme.typography.labelMedium,
+                    color = Color.White
+                )
+            }
         }
     }
 }
@@ -257,6 +256,7 @@ private fun RecipeCard(recipe: SearchResult, onClick: (Long) -> Unit) = Card(
 private fun RecipeOverviewScreenLoadingPreview() = RecipeTheme {
     RecipeOverviewContent(
         state = RecipeOverviewViewModelState(),
+        history = HistoryState.NoHistory,
         onSearch = {},
         onSelectRecipe = {},
     )
@@ -270,6 +270,7 @@ private fun RecipeOverviewScreenErrorPreview() = RecipeTheme {
             query = "Lasagna",
             searchResults = SearchRecipeState.Error(NetworkFailure.PAYMENT_REQUIRED),
         ),
+        history = HistoryState.NoHistory,
         onSearch = {},
         onSelectRecipe = {},
     )
@@ -286,11 +287,23 @@ private fun RecipeOverviewScreenSuccessPreview() = RecipeTheme {
         readyInMinutes = 45,
     )
 
+    val detail = RecipeDetail(
+        id = 640864L,
+        title = "Crock Pot Lasagna",
+        readyInMinutes = 45,
+        image = "https://img.spoonacular.com/recipes/640864-556x370.jpg",
+        sourceUrl = "https://www.foodista.com/recipe/QTRKQVWX/crock-pot-lasagna",
+        instructions = "instructions",
+        analyzedInstructions = emptyList(),
+        extendedIngredients = emptyList(),
+    )
+
     RecipeOverviewContent(
         state = RecipeOverviewViewModelState(
             query = "Lasagna",
             searchResults = SearchRecipeState.Success(List(10) { searchResult }),
         ),
+        history = HistoryState.Success(history = List(10) { detail }),
         onSearch = {},
         onSelectRecipe = {},
     )
